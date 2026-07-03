@@ -1,0 +1,755 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700;900&family=Share+Tech+Mono&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060608;--surface:#0c0c10;--border:#1c1c22;
+  --accent:#7a0000;--accent2:#b01010;--text:#bcbcc8;--dim:#52525e;
+  --mem:#5a8a3a;--f-title:'Noto Serif JP',serif;--f-mono:'Share Tech Mono',monospace;
+}
+#root{background:var(--bg);color:var(--text);font-family:var(--f-title);min-height:640px;position:relative;overflow:hidden}
+#root::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.04) 3px,rgba(0,0,0,.04) 4px);pointer-events:none;z-index:200}
+
+/* TITLE */
+#title{position:absolute;inset:0;z-index:150;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);overflow:hidden}
+#tbg{position:absolute;font-family:var(--f-mono);font-size:11px;color:rgba(100,0,0,.06);line-height:1.9;white-space:pre;top:0;left:0;width:100%;height:100%;overflow:hidden;user-select:none}
+#tinner{position:relative;text-align:center;z-index:2}
+#teyebrow{font-family:var(--f-mono);font-size:9px;letter-spacing:.5em;color:var(--dim);margin-bottom:20px;text-transform:uppercase}
+#tkanji{font-size:50px;font-weight:900;color:#d0c8c0;line-height:1;letter-spacing:.15em;margin-bottom:6px}
+#tslash{width:40px;height:1px;background:var(--accent);margin:14px auto;opacity:.6}
+#ten{font-family:var(--f-mono);font-size:10px;letter-spacing:.35em;color:#403838;margin-bottom:32px;text-transform:uppercase}
+#tflavor{font-size:13px;line-height:2.4;color:#3a3840;max-width:300px;margin:0 auto 36px}
+#tflavor span{color:#58505a}
+#sbtn{position:relative;background:transparent;border:none;color:#6a5050;font-family:var(--f-mono);font-size:11px;letter-spacing:.25em;padding:14px 36px;cursor:pointer;transition:color .3s}
+#sbtn::before,#sbtn::after{content:'';position:absolute;transition:all .3s}
+#sbtn::before{top:0;left:0;right:0;bottom:0;border-top:1px solid #2a1818;border-bottom:1px solid #2a1818}
+#sbtn::after{top:4px;left:4px;right:4px;bottom:4px;border-left:1px solid #1e1010;border-right:1px solid #1e1010}
+#sbtn:hover{color:#c09080}
+#sbtn:hover::before{border-color:#5a2020}
+#tpatient{position:absolute;bottom:20px;font-family:var(--f-mono);font-size:9px;letter-spacing:.2em;color:#1c1c22}
+.flicker{animation:fl 4s infinite}
+@keyframes fl{0%,92%,100%{opacity:1}93%{opacity:.2}95%{opacity:.9}97%{opacity:.3}}
+
+/* HUD */
+#hud{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;background:rgba(6,6,8,.92);border-bottom:1px solid var(--border);font-family:var(--f-mono);font-size:11px;position:sticky;top:0;z-index:50;gap:8px}
+.h-mem{color:var(--mem)}
+#maptoggle{background:transparent;border:1px solid #222228;color:var(--dim);font-family:var(--f-mono);font-size:10px;padding:3px 10px;cursor:pointer;letter-spacing:.1em;transition:all .2s;border-radius:1px}
+#maptoggle:hover{border-color:#3a3a48;color:var(--text)}
+#maptoggle.act{border-color:#3a2030;color:#8a5060;background:rgba(60,0,20,.15)}
+
+/* MAP PANEL */
+#mappanel{background:var(--surface);border-bottom:1px solid var(--border);overflow:hidden;max-height:0;transition:max-height .4s ease}
+#mappanel.open{max-height:300px}
+#mapwrap{padding:14px 16px}
+#maptitlerow{font-family:var(--f-mono);font-size:9px;letter-spacing:.25em;color:var(--dim);margin-bottom:10px;display:flex;justify-content:space-between}
+#mapsvg{width:100%;display:block}
+#memstrip{display:flex;gap:3px;margin-top:10px;padding-top:10px;border-top:1px solid #14141a;align-items:center}
+.ms{width:18px;height:18px;border:1px solid #1a1a20;background:#0e0e12;border-radius:1px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#202028;transition:all .3s;font-family:var(--f-mono)}
+.ms.on{border-color:#2a3a1a;background:#121a0e;color:#4a6a2a}
+.mslabel{font-family:var(--f-mono);font-size:9px;color:var(--dim);margin-right:6px}
+
+/* ITEMS */
+#itemrow{padding:6px 14px;display:flex;gap:4px;flex-wrap:wrap;min-height:26px}
+.ibadge{font-family:var(--f-mono);font-size:9px;padding:2px 7px;border:1px solid #2a1a14;color:#7a4a36;background:#0e0808;border-radius:1px}
+
+/* STAGE */
+#stage{padding:20px 20px 10px}
+#loctag{font-family:var(--f-mono);font-size:9px;color:var(--dim);letter-spacing:.2em;text-transform:uppercase;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #141418}
+#story{font-size:15.5px;line-height:2.1;color:var(--text);min-height:160px;white-space:pre-wrap}
+#choices{padding:0 20px 20px;display:flex;flex-direction:column;gap:6px}
+.cbtn{background:transparent;border:1px solid #1c1c22;color:#888;font-family:var(--f-title);font-size:14px;padding:11px 16px;text-align:left;cursor:pointer;transition:border-color .2s,color .2s,background .2s;border-radius:1px;line-height:1.5}
+.cbtn::before{content:'▶ ';color:var(--accent);font-size:10px}
+.cbtn:hover{border-color:var(--accent2);color:#ddd;background:rgba(100,0,0,.07)}
+.cbtn:active{transform:translateX(2px)}
+.cbtn[disabled]{color:#241414;border-color:#140a0a;cursor:not-allowed}
+.cbtn[disabled]::before{content:'✕ ';color:#341414}
+
+/* HORROR OVERLAY */
+#hoverlay{position:absolute;inset:0;pointer-events:none;z-index:30;opacity:0;transition:opacity .25s ease;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 45%, rgba(40,0,0,.5) 0%, transparent 65%)}
+#hoverlay.show{opacity:1}
+#hoverlay.hide{opacity:0;transition:opacity .8s ease}
+#hicon{font-size:130px;line-height:1;filter:drop-shadow(0 0 24px rgba(200,0,0,.4))}
+
+/* EVENT BANNER */
+#evbanner{position:absolute;bottom:0;left:0;right:0;z-index:40;pointer-events:none;display:flex;justify-content:center;padding-bottom:14px;opacity:0;transition:opacity .4s}
+#evbanner.show{opacity:1}
+#evinner{font-family:var(--f-mono);font-size:11px;padding:7px 20px;border:1px solid #3a1010;color:#c07060;background:rgba(6,6,8,.97);letter-spacing:.1em;border-radius:1px;text-align:center}
+
+/* NOISE */
+#noise{position:absolute;inset:0;pointer-events:none;opacity:0;z-index:20;mix-blend-mode:overlay;transition:opacity .8s;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* CURSOR */
+#cursor{display:inline-block;width:2px;height:14px;background:#60606a;vertical-align:middle;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* END SCREEN */
+#end{display:none;position:absolute;inset:0;background:rgba(6,6,8,.97);z-index:300;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px}
+#end.show{display:flex}
+#endtype{font-family:var(--f-mono);font-size:9px;letter-spacing:.5em;color:var(--accent);margin-bottom:10px}
+#endtitle{font-size:22px;color:#d0c8c0;margin-bottom:18px;letter-spacing:.08em}
+#enddesc{font-size:13px;line-height:2.3;color:#585060;max-width:380px;margin-bottom:28px;white-space:pre-line}
+.endbtn{background:transparent;border:1px solid #2a1818;color:#7a5050;font-family:var(--f-mono);font-size:10px;padding:10px 24px;cursor:pointer;letter-spacing:.15em;transition:all .2s;margin:4px}
+.endbtn:hover{border-color:var(--accent2);color:#c09080}
+
+/* MAP SVG STYLES */
+.mroom{fill:#0d0d12;stroke:#2a2a38;stroke-width:1}
+.mroom.vis{fill:#141420;stroke:#38384a}
+.mroom.cur{fill:#1e0808;stroke:#6a2020;stroke-width:1.5}
+.mroom.lck{fill:#08080c;stroke:#18181e;stroke-dasharray:3 2}
+.mstair{fill:#0a0a10;stroke:#222230;stroke-width:1}
+.mstair.vis{stroke:#30303e}
+.mlabel{font-family:'Share Tech Mono',monospace;font-size:9px;fill:#303040}
+.mlabel.vis{fill:#4a4a5e}
+.mlabel.cur{fill:#c07060}
+.mcurdot{fill:#c06060}
+.mconn{stroke:#1e1e28;stroke-width:1;fill:none}
+.mconn.vis{stroke:#2a2a3a}
+</style>
+
+<div id="root">
+  <div id="noise"></div>
+  <div id="hoverlay"><div id="hicon">👁</div></div>
+  <div id="evbanner"><div id="evinner"></div></div>
+
+  <!-- TITLE -->
+  <div id="title">
+    <div id="tbg"></div>
+    <div id="tinner">
+      <div id="teyebrow">Scenario Horror Adventure</div>
+      <div id="tkanji" class="flicker">廃病院の記憶</div>
+      <div id="tslash"></div>
+      <div id="ten">Memory of the Abandoned Hospital</div>
+      <div id="tflavor">目覚めると——廃病院にいた。<br><span>自分が誰なのか、思い出せない。</span><br><br>探索し、記憶を取り戻せ。<br><span>しかし、病院には何かがいる。</span></div>
+      <button id="sbtn" onclick="startGame()">— 探索を開始する —</button>
+    </div>
+    <div id="tpatient">PATIENT No. 0047 ／ STATUS : UNKNOWN ／ EAST SHINONOME GENERAL HOSPITAL</div>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud">
+    <div style="font-family:var(--f-mono);font-size:11px;color:#2e2e3a;letter-spacing:.1em">EAST SHINONOME HOSP.</div>
+    <button id="maptoggle" onclick="toggleMap()">MAP</button>
+    <div class="h-mem">記憶 <span id="mnum">0</span>/8</div>
+  </div>
+
+  <!-- MAP PANEL -->
+  <div id="mappanel">
+    <div id="mapwrap">
+      <div id="maptitlerow">
+        <span>FLOOR MAP — EAST SHINONOME GENERAL HOSPITAL</span>
+        <span id="maploc">現在地：——</span>
+      </div>
+      <svg id="mapsvg" viewBox="0 0 560 230" xmlns="http://www.w3.org/2000/svg">
+        <!-- Floor labels -->
+        <text x="8" y="36" class="mlabel" style="font-size:8px;fill:#303040">2F</text>
+        <text x="8" y="118" class="mlabel" style="font-size:8px;fill:#303040">1F</text>
+        <text x="8" y="200" class="mlabel" style="font-size:8px;fill:#303040">B1</text>
+        <!-- Floor baseline guides (dashed) -->
+        <line x1="28" y1="14" x2="28" y2="215" stroke="#181820" stroke-width="1" stroke-dasharray="2 4"/>
+
+        <!-- 2F rooms -->
+        <rect id="mr-floor2"        class="mroom" x="40"  y="16"  width="72" height="34" rx="2"/>
+        <rect id="mr-ward"          class="mroom" x="130" y="16"  width="72" height="34" rx="2"/>
+        <rect id="mr-nurse_station" class="mroom" x="220" y="16"  width="96" height="34" rx="2"/>
+        <rect id="mr-iso_ward"      class="mroom lck" x="334" y="16" width="72" height="34" rx="2"/>
+        <!-- 2F connectors -->
+        <line class="mconn" x1="112" y1="33" x2="130" y2="33"/>
+        <line class="mconn" x1="202" y1="33" x2="220" y2="33"/>
+        <line class="mconn" x1="316" y1="33" x2="334" y2="33"/>
+        <!-- 2F labels -->
+        <text id="ml-floor2"        class="mlabel" x="76"  y="37" text-anchor="middle">2F廊下</text>
+        <text id="ml-ward"          class="mlabel" x="166" y="37" text-anchor="middle">病室</text>
+        <text id="ml-nurse_station" class="mlabel" x="268" y="37" text-anchor="middle">ナースステーション</text>
+        <text id="ml-iso_ward"      class="mlabel" x="370" y="37" text-anchor="middle">隔離病棟</text>
+
+        <!-- Stairs 1F→2F -->
+        <rect id="mr-stairs12"  class="mstair" x="40" y="56" width="36" height="52" rx="2"/>
+        <text class="mlabel" x="58" y="77" text-anchor="middle" style="font-size:7px">階段</text>
+        <text class="mlabel" x="58" y="88" text-anchor="middle" style="font-size:7px">1F↔2F</text>
+        <!-- Stair connection line -->
+        <line class="mconn" x1="58" y1="50" x2="58" y2="56"/>
+        <line class="mconn" x1="58" y1="108" x2="58" y2="98"/>
+        <line id="sc-stairs12-top" class="mconn" x1="40" y1="33" x2="58" y2="33"/>
+        <line class="mconn" x1="58" y1="33" x2="58" y2="50"/>
+
+        <!-- 1F rooms -->
+        <rect id="mr-start"       class="mroom" x="88"  y="98"  width="72" height="34" rx="2"/>
+        <rect id="mr-lobby"       class="mroom" x="178" y="98"  width="72" height="34" rx="2"/>
+        <rect id="mr-waiting_room" class="mroom" x="268" y="98" width="72" height="34" rx="2"/>
+        <rect id="mr-exam_room"   class="mroom" x="358" y="98"  width="72" height="34" rx="2"/>
+        <!-- 1F connectors -->
+        <line class="mconn" x1="76"  y1="115" x2="88"  y2="115"/>
+        <line class="mconn" x1="160" y1="115" x2="178" y2="115"/>
+        <line class="mconn" x1="250" y1="115" x2="268" y2="115"/>
+        <line class="mconn" x1="340" y1="115" x2="358" y2="115"/>
+        <!-- 1F stair join -->
+        <line class="mconn" x1="58" y1="115" x2="88" y2="115"/>
+        <!-- 1F labels -->
+        <text id="ml-start"        class="mlabel" x="124" y="119" text-anchor="middle">診察室A</text>
+        <text id="ml-lobby"        class="mlabel" x="214" y="119" text-anchor="middle">受付</text>
+        <text id="ml-waiting_room" class="mlabel" x="304" y="119" text-anchor="middle">待合室</text>
+        <text id="ml-exam_room"    class="mlabel" x="394" y="119" text-anchor="middle">診察室B</text>
+
+        <!-- Stairs 1F→B1 -->
+        <rect id="mr-stairsb" class="mstair" x="178" y="138" width="36" height="52" rx="2"/>
+        <text class="mlabel" x="196" y="159" text-anchor="middle" style="font-size:7px">階段</text>
+        <text class="mlabel" x="196" y="170" text-anchor="middle" style="font-size:7px">1F↔B1</text>
+        <line class="mconn" x1="196" y1="132" x2="196" y2="138"/>
+        <line class="mconn" x1="196" y1="115" x2="196" y2="132"/>
+        <line class="mconn" x1="196" y1="190" x2="196" y2="196"/>
+
+        <!-- B1 rooms -->
+        <rect id="mr-morgue"      class="mroom lck" x="88"  y="196" width="72" height="34" rx="2"/>
+        <rect id="mr-burned"      class="mroom lck" x="196" y="196" width="72" height="34" rx="2"/>
+        <rect id="mr-sealed_room" class="mroom lck" x="304" y="196" width="80" height="34" rx="2"/>
+        <!-- B1 connectors -->
+        <line class="mconn" x1="160" y1="213" x2="196" y2="213"/>
+        <line class="mconn" x1="268" y1="213" x2="304" y2="213"/>
+        <!-- B1 labels -->
+        <text id="ml-morgue"      class="mlabel" x="124" y="217" text-anchor="middle">霊安室</text>
+        <text id="ml-burned"      class="mlabel" x="232" y="217" text-anchor="middle">焼失区画</text>
+        <text id="ml-sealed_room" class="mlabel" x="344" y="217" text-anchor="middle">封鎖病室</text>
+
+        <!-- Current position dot (moved by JS) -->
+        <circle id="curdot" class="mcurdot" cx="-99" cy="-99" r="4"/>
+      </svg>
+      <div id="memstrip"><div class="mslabel">MEMORY :</div></div>
+    </div>
+  </div>
+
+  <!-- ITEMS -->
+  <div id="itemrow"></div>
+
+  <!-- STAGE -->
+  <div id="stage">
+    <div id="loctag">——</div>
+    <div id="story"><span id="cursor"></span></div>
+  </div>
+  <div id="choices"></div>
+
+  <!-- END -->
+  <div id="end">
+    <div id="endtype"></div>
+    <div id="endtitle"></div>
+    <div id="enddesc"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:4px">
+      <button class="endbtn" id="contbtn" onclick="continueGame()">— 記憶を引き継いで再挑戦 —</button>
+      <button class="endbtn" onclick="restartGame()">— 最初からやり直す —</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Title BG
+(()=>{
+  const w=['患者番号','記録','消去','記憶','封印','東雲総合病院','昭和63年','火災','生存者','0047','禁止区域','逃げるな','忘却','罪悪感','幻影','閉鎖'];
+  const lines=[];
+  for(let i=0;i<30;i++){let l='';for(let j=0;j<8;j++)l+=w[Math.floor(Math.random()*w.length)]+'　';lines.push(l);}
+  document.getElementById('tbg').textContent=lines.join('\n');
+})();
+
+// ─── ROOM CENTER COORDS for cursor dot ───────────────────────
+const ROOM_CENTERS={
+  start:{x:124,y:115},lobby:{x:214,y:115},waiting_room:{x:304,y:115},exam_room:{x:394,y:115},
+  floor2:{x:76,y:33},ward:{x:166,y:33},nurse_station:{x:268,y:33},iso_ward:{x:370,y:33},
+  morgue:{x:124,y:213},burned:{x:232,y:213},sealed_room:{x:344,y:213},
+  stairs12:{x:58,y:82},stairsb:{x:196,y:164}
+};
+
+// ─── SCENARIO DATA ────────────────────────────────────────────
+// horror: '👁' | '💀' | '🩸'  (shown BEFORE text)
+// event: string (shown AFTER text as banner)
+// bad: true → ending after text
+const SC={
+  start:{
+    loc:"1F — 診察室",mapId:"start",
+    text:"目が覚めた。白い天井、錆びた照明——ここは病院だ。自分がどうやってここに来たのか、まったく思い出せない。体を起こすと、手首に患者番号のリストバンドが巻かれているのが見えた。「患者番号：0047」。名前が、出てこない。",
+    choices:[
+      {t:"リストバンドをよく調べる",n:"lobby"},
+      {t:"出口を探して廊下へ出る",n:"lobby"}
+    ]
+  },
+  lobby:{
+    loc:"1F — 受付ロビー",mapId:"lobby",
+    text:"廊下に出ると、受付ロビーに繋がっていた。かつては人の声で満ちていたはずの空間が、今は埃と静寂だけで満たされている。受付カウンターの上に何かが置かれているのが見えた。入口の方向を確認したが、外は暗く、道は見えなかった。",
+    choices:[
+      {t:"受付カウンターを調べる",n:"lobby_key"},
+      {t:"奥の待合室へ向かう",n:"waiting_room"},
+      {t:"入口のドアを試す",n:"exit_try"}
+    ]
+  },
+  exit_try:{
+    loc:"1F — 入口",mapId:"lobby",
+    text:"入口のドアに手をかけた。冷たい金属の感触。引いても押しても、ドアはびくともしない。鍵がかかっているようだ。ガラス越しに外を見ると、ただ暗闇が広がっているだけだった。まだ、ここを出ることはできない。",
+    choices:[{t:"ロビーへ戻る",n:"lobby"}]
+  },
+  lobby_key:{
+    loc:"1F — 受付",mapId:"lobby",
+    text:"カウンターの上に「錆びた鍵」が置いてあった。形状から察するに、地下への扉に合う鍵だろう。その隣には、表紙が半分焦げた古い日記が置かれている。誰かが意図的にここへ残したものに見えた。",
+    choices:[
+      {t:"錆びた鍵を取る",n:"got_key",flag:"gotKey",item:"錆びた鍵"},
+      {t:"古い日記を読む",n:"old_diary",mem:0},
+      {t:"ロビーへ戻る",n:"lobby"}
+    ]
+  },
+  got_key:{
+    loc:"1F — 受付",mapId:"lobby",
+    text:"錆びた鍵を手に取った。冷たく、ずっしりと重い。これを手放してはいけない気がした。",
+    choices:[{t:"待合室へ向かう",n:"waiting_room"}]
+  },
+  old_diary:{
+    loc:"1F — 受付",mapId:"lobby",
+    horror:'📖',
+    text:"日記を開く。インクの文字は滲み、ところどころ読めない。それでも一節だけが、妙に鮮明に目に入った。\n\n——記憶の断片①——\n「幼い少女の泣き声が聞こえる。深夜、どこかの病室から。先生たちはみんな、知らない顔をしている」\n\n手が震えた。この声を、どこかで聞いたことがある。",
+    mem:0,event:"記憶の断片①を入手した",
+    choices:[{t:"日記を閉じる",n:"lobby_key2"}]
+  },
+  lobby_key2:{
+    loc:"1F — 受付",mapId:"lobby",
+    text:"日記を伏せた。頭の奥で、何かが揺れている。記憶の欠片のようでいて、まだ形にならない。",
+    choices:[
+      {t:"待合室へ向かう",n:"waiting_room"},
+      {t:"錆びた鍵を取る",n:"got_key",flag:"gotKey",item:"錆びた鍵"}
+    ]
+  },
+  waiting_room:{
+    loc:"1F — 待合室",mapId:"waiting_room",
+    text:"待合室に入ると、椅子の多くが倒れ、床にはガラスの破片が散乱していた。壁に目を向けると、何かが書かれている。近づいて読んでみると——「逃げるな」。文字はひどく乱れていて、書いた者の心の状態を物語っているようだった。",
+    choices:[
+      {t:"壁の文字をよく調べる",n:"wall_text"},
+      {t:"奥の診察室Bへ向かう",n:"exam_room"},
+      {t:"2階への階段へ向かう",n:"floor2_stairs"}
+    ]
+  },
+  wall_text:{
+    loc:"1F — 待合室",mapId:"waiting_room",
+    horror:'🩸',
+    text:"壁に近づいて、ようやくわかった。それは血で書かれていた。「逃げるな」の文字の下に、さらに小さな字がびっしりと続いている。「0047は知っている。0047は見ていた。0047はここにいる」——0047は、今自分の手首に巻かれた患者番号だ。",
+    event:"血文字を発見した",
+    choices:[
+      {t:"急いでその場を離れる",n:"waiting_room_b"},
+      {t:"さらに調べる",n:"waiting_room_deep"}
+    ]
+  },
+  waiting_room_b:{
+    loc:"1F — 待合室",mapId:"waiting_room",
+    text:"足早にその場を離れた。胸の鼓動が速い。あの文字が何を意味するのか、まだわからない。ただ、自分がここで何かを見たという事実だけが頭に残った。",
+    choices:[
+      {t:"診察室Bへ向かう",n:"exam_room"},
+      {t:"2階へ向かう",n:"floor2_stairs"}
+    ]
+  },
+  waiting_room_deep:{
+    loc:"1F — 待合室",mapId:"waiting_room",
+    horror:'👁',
+    text:"文字をなぞった瞬間、視界が歪んだ。脳裏に映像が流れ込んでくる。\n\n——記憶の断片②——\n炎に包まれた廊下。誰かが走っている。自分はどこかで立ち止まって、それをただ見ていた。\n\nふいに視界の端に、白い影が見えた——いや、気のせいか。",
+    mem:1,event:"記憶の断片②を入手した",
+    choices:[{t:"その場を離れる",n:"waiting_room_b"}]
+  },
+  exam_room:{
+    loc:"1F — 診察室B",mapId:"exam_room",
+    text:"診察室に入ると、古いカルテが床一面に散らばっていた。乱暴に引き出しから掻き出されたような状態だ。その中の一枚が、なぜか目を引いた。「患者番号：0047」。名前の欄は、黒く塗り潰されていた。",
+    choices:[
+      {t:"カルテを拾い上げる",n:"karte"},
+      {t:"棚の奥を調べる",n:"shelf"},
+      {t:"待合室へ戻る",n:"waiting_room"}
+    ]
+  },
+  karte:{
+    loc:"1F — 診察室B",mapId:"exam_room",
+    text:"カルテを手に取った。\n\n——記憶の断片③——\n閉ざされた病室のドア。鍵の回る音。外から鍵をかけられた——誰かによって。\n\n中に閉じ込められていたのは誰だったのか。記憶はそこで途切れた。",
+    mem:2,event:"記憶の断片③を入手した",
+    choices:[
+      {t:"2階へ向かう",n:"floor2_stairs"},
+      {t:"待合室へ戻る",n:"waiting_room"}
+    ]
+  },
+  shelf:{
+    loc:"1F — 診察室B",mapId:"exam_room",
+    text:"棚の奥に、布に包まれたものがあった。取り出してみると、古い木製のお守りだ。病院には全くそぐわない。誰かが大切に、意図的にここへ置いたのだろう。手に持つと、奇妙なことに、少し心が落ち着いた気がした。",
+    event:"古いお守りを発見した",
+    choices:[
+      {t:"お守りを持っていく",n:"shelf_take",item:"古いお守り"},
+      {t:"そのままにしておく",n:"exam_room"}
+    ]
+  },
+  shelf_take:{
+    loc:"1F — 診察室B",mapId:"exam_room",
+    text:"お守りをポケットに入れた。誰かの祈りが宿っているような気がして、手放せなかった。",
+    choices:[
+      {t:"2階へ向かう",n:"floor2_stairs"},
+      {t:"待合室へ戻る",n:"waiting_room"}
+    ]
+  },
+  floor2_stairs:{
+    loc:"1F → 2F — 階段",mapId:"stairs12",
+    horror:'👁',
+    text:"階段を登り始めた。一段踏み出すたびに軋む音が響き、それが廊下に反響する。踊り場に差し掛かると、壁に大きな鏡があった。自分の顔を確認しようと近づいた——その瞬間、鏡の奥に、自分ではない何かの輪郭が映った。目を凝らしたときには、もう消えていた。",
+    event:"鏡の中に何かが見えた",
+    choices:[
+      {t:"そのまま2階へ上がる",n:"floor2"},
+      {t:"鏡をじっくり見る",n:"mirror"}
+    ]
+  },
+  mirror:{
+    loc:"踊り場 — 鏡",mapId:"stairs12",
+    horror:'👁',
+    text:"鏡の前に立ち、じっと見つめた。最初は自分の顔が映っていた。しかし瞬きのたびに、何かが少しずつずれていく。表情が、違う。目が、違う。そして——鏡の中の人間が、微笑んだ。",
+    event:"鏡の中の存在と目が合った",
+    choices:[
+      {t:"走って2階へ逃げる",n:"floor2"},
+      {t:"立ち尽くす",n:"mirror_bad"}
+    ]
+  },
+  mirror_bad:{
+    loc:"踊り場 — 鏡",mapId:"stairs12",
+    horror:'💀',
+    text:"足が動かなかった。鏡の中の何かが、ゆっくりとこちらへ近づいてくる。声を上げようとしたが、喉が締め付けられたように声が出ない。ただ、その存在だけが、どんどん近づいてくる——意識が遠のいていった。",
+    bad:true,badType:"BAD END",badTitle:"鏡の向こう側",
+    badDesc:"鏡の中の存在に囚われてしまった。それは自分の恐怖が生み出した幻。真実を見つめようとせず、足を止めた者はそこへ引き込まれる。\n\nあなたは二度と戻ってこなかった。",
+    choices:[]
+  },
+  floor2:{
+    loc:"2F — 廊下",mapId:"floor2",
+    text:"2階の廊下に出た。扉が等間隔に並んでいる。ほとんどが開いていたが、廊下の突き当たりにある一つだけが、重厚な金属扉で閉ざされていた。「ナースステーション」の看板と、「隔離病棟」と書かれたプレートが目に入る。",
+    choices:[
+      {t:"近くの病室を調べる",n:"ward"},
+      {t:"ナースステーションへ向かう",n:"nurse_station"},
+      {t:"隔離病棟の扉を確認する",n:"iso_ward_locked"}
+    ]
+  },
+  ward:{
+    loc:"2F — 病室",mapId:"ward",
+    horror:'👁',
+    text:"病室に入ると、ベッドに人が横たわっているのが見えた。思わず息を呑んだが——近づくと、それは人形だった。患者服を着た古い人形が、丁寧に寝かされている。その手に、折り畳まれたメモ紙が握られていた。\n\n——記憶の断片④——\n「非常ベルが鳴っていた。でも、誰も来なかった」",
+    mem:3,event:"記憶の断片④を入手した",
+    choices:[{t:"廊下へ戻る",n:"floor2"}]
+  },
+  nurse_station:{
+    loc:"2F — ナースステーション",mapId:"nurse_station",
+    text:"ナースステーションの棚に、分厚い冊子が残っていた。表紙には「事故報告書 東雲総合病院 昭和63年」とある。これを読めば真相に近づけるかもしれない。しかし同時に、知りたくないものを知ることになるという予感もあった。",
+    choices:[
+      {t:"事故報告書を読む",n:"nurse_record",flag:"gotDiary"},
+      {t:"廊下へ戻る",n:"floor2"}
+    ]
+  },
+  nurse_record:{
+    loc:"2F — ナースステーション",mapId:"nurse_station",
+    text:"報告書を開いた。\n\n——記憶の断片⑤——\n「昭和63年3月、東雲総合病院にて火災発生。入院患者23名が逃げ遅れ死亡。生存者は1名のみ、患者番号：0047」\n\n0047。それは今、自分の手首に巻かれた番号だ。",
+    mem:4,event:"記憶の断片⑤を入手した",
+    choices:[
+      {t:"続きを読む",n:"nurse_record2"},
+      {t:"報告書を閉じる",n:"floor2"}
+    ]
+  },
+  nurse_record2:{
+    loc:"2F — ナースステーション",mapId:"nurse_station",
+    text:"震える指でページをめくった。「生存者（0047）は事件後、記憶の喪失を訴えた。精神的トラウマと判断。当事者の意思により記憶の封印処置を実施、封印日：昭和63年4月」——自分で、記憶を消したのか。いったい何を、忘れたかったのか。",
+    choices:[
+      {t:"地下へ向かう",n:"to_basement"},
+      {t:"廊下へ戻る",n:"floor2"}
+    ]
+  },
+  iso_ward_locked:{
+    loc:"2F — 隔離病棟前",mapId:"floor2",
+    horror:'👁',
+    text:"重厚な金属扉の前に立った。鍵穴がある。扉の隙間から、かすかに何かの音が聞こえてくる——息をしているような、規則正しい音。自分の呼吸ではない。",
+    choices:[
+      {t:"鍵を使って開ける",n:"iso_ward",needsKey:true},
+      {t:"廊下へ戻る",n:"floor2"}
+    ]
+  },
+  iso_ward:{
+    loc:"2F — 隔離病棟",mapId:"iso_ward",
+    horror:'🩸',
+    text:"鍵を使って扉を開けた。中は空だった——いや、空ではない。壁一面に、同じ言葉が繰り返し書き連ねられている。「ゆるしてください」。\n\n——記憶の断片⑥——\n助けを求める声が脳裏に響いた。扉の向こうから聞こえたはずの声を、自分は聞こえないふりをしていた。",
+    mem:5,event:"記憶の断片⑥を入手した",
+    choices:[{t:"廊下へ戻る",n:"floor2"}]
+  },
+  to_basement:{
+    loc:"地下 — 階段",mapId:"stairsb",
+    text:"地下への階段は暗く、壁に沿って手探りで降りた。一段ごとに焦げた匂いが強くなる。ここで火が起きたのだということが、体でわかった。",
+    choices:[
+      {t:"霊安室へ向かう",n:"morgue"},
+      {t:"焼失区画へ向かう",n:"burned"}
+    ]
+  },
+  morgue:{
+    loc:"地下 — 霊安室",mapId:"morgue",
+    horror:'💀',
+    text:"霊安室に入ると、壁に名前が刻まれていた。23人分の名前。丁寧に、一人ずつ。その中の一つを見た瞬間、胸の奥が締め付けられた——見覚えがある。\n\n——記憶の断片⑦——\n自分の名前が、浮かんだ。記憶の扉が、少し開く。",
+    mem:6,event:"記憶の断片⑦を入手した",
+    choices:[
+      {t:"封鎖病室へ向かう",n:"sealed_room"},
+      {t:"焼失区画を通る",n:"burned"}
+    ]
+  },
+  burned:{
+    loc:"地下 — 焼失区画",mapId:"burned",
+    text:"焼け焦げた廊下を進んだ。壁も天井も黒く、足元には崩れた天井材が積もっている。静寂の中を歩いていると、足音が聞こえた——自分のものではない。「ドン、ドン」と、ゆっくりとこちらへ近づいてくる。",
+    choices:[
+      {t:"走って逃げる",n:"burned_run"},
+      {t:"その場で待つ",n:"burned_wait"},
+      {t:"「誰ですか」と声をかける",n:"burned_call"}
+    ]
+  },
+  burned_run:{
+    loc:"地下 — 焼失区画",mapId:"burned",
+    text:"走った。廊下の角を曲がり、がむしゃらに駆け抜ける。いつの間にか足音は消えていた。息を切らして立ち止まると、目の前に重い扉があった。「封鎖病室」というプレートが貼られている。",
+    choices:[{t:"封鎖病室へ入る",n:"sealed_room"}]
+  },
+  burned_wait:{
+    loc:"地下 — 焼失区画",mapId:"burned",
+    horror:'💀',
+    text:"立ち止まって待った。足音が近づいてくる。廊下の角から——顔のない白い影が現れた。人の形をしているが、人ではない。それはこちらを「見た」。目がないのに、確かに見ていた。動けなかった。",
+    bad:true,badType:"BAD END",badTitle:"振り返ってはいけない",
+    badDesc:"足音の主と向き合ってしまった。それは自分の罪悪感が生み出した幻——足を止めて待ち続けた者は、その場に飲み込まれる。\n\nあなたは二度と戻ってこなかった。",
+    choices:[]
+  },
+  burned_call:{
+    loc:"地下 — 焼失区画",mapId:"burned",
+    text:"「誰ですか」と声をかけた。足音が止まった。長い沈黙の後、声が聞こえた。「……なぜ、忘れたの」。\n\n——記憶の断片⑧——\n火災報知器の音。患者たちの声。自分は外にいた——扉を開けることができたのに、開けなかった。恐ろしかったから。",
+    mem:7,event:"記憶の断片⑧を入手した",
+    choices:[{t:"封鎖病室へ向かう",n:"sealed_room"}]
+  },
+  sealed_room:{
+    loc:"地下 — 封鎖病室",mapId:"sealed_room",
+    text:"封鎖病室の扉の前に立った。ここが——最後の場所だ。扉に手をかける前に、もう答えはわかっていた気がした。23人の死。唯一の生存者、0047。扉の向こうに、真実がある。",
+    choices:[
+      {t:"扉を開ける",n:"true_check"},
+      {t:"逃げ出す",n:"normal_escape"}
+    ]
+  },
+  true_check:{
+    loc:"地下 — 封鎖病室",mapId:"sealed_room",
+    text:"扉を開けた。中は空だった。ただ、一冊のノートと——鏡。鏡の中の自分が、泣いていた。",
+    choices:[
+      {t:"ノートを読む",n:"true_final"},
+      {t:"鏡を割る",n:"true_mirror"}
+    ]
+  },
+  true_final:{
+    loc:"地下 — 封鎖病室",mapId:"sealed_room",
+    text:"ノートを開いた。自分の筆跡だった。「私は事件当日、外にいた。助けを呼ぶことができた。でも呼ばなかった——恐ろしくて。23人が死んだ。私のせいで。忘れなければ生きていけなかった」\n\n涙が出た。病院の中の幽霊たちは犠牲者ではなかった——自分の罪悪感が生み出した影だったのだ。",
+    event:"すべての記憶が戻った",
+    choices:[{t:"すべてを受け入れる",n:"true_resolve"}]
+  },
+  true_mirror:{
+    loc:"地下 — 封鎖病室",mapId:"sealed_room",
+    text:"鏡に拳を叩きつけた。砕けた鏡の向こうから、記憶が洪水のように流れ込んでくる——炎、煙、扉の外で立ち竦む自分、叫ぶ人々の声。「助けてください」「ドアを開けて」。開けなかった。逃げた。23人を残して。",
+    event:"すべての記憶が戻った",
+    choices:[{t:"真実と向き合う",n:"true_resolve"}]
+  },
+  true_resolve:{
+    loc:"地下 — 封鎖病室",mapId:"sealed_room",
+    text:"しばらくの間、床に座ったまま泣いた。誰もいない廃病院で、一人で。やがて、病院の中が静かに変わり始めた。壁の文字が消え、足音が聞こえなくなり、幽霊がいなくなった。すべては自分の心が作り出したものだった。目を閉じ、23人の名前を一人ずつ呟いた。「ごめんなさい」——病院が、静かに消えていく。",
+    ending:'true',choices:[]
+  },
+  normal_escape:{
+    loc:"地下 → 地上",mapId:"lobby",
+    text:"走った。記憶を持たないまま、ただ逃げた。入口のドアが——今度は開いた。外の光が眩しい。振り返ると、廃病院がそこに佇んでいる。ここで何があったのか。自分が何者なのか。わからないまま——歩き出した。",
+    ending:'normal',choices:[]
+  }
+};
+
+// ─── STATE ───────────────────────────────────────────────────
+let G={
+  mem:new Array(8).fill(false),
+  items:[],
+  flags:{gotKey:false,gotDiary:false},
+  visited:new Set(),
+  cur:'start',typing:false,timer:null,mapOpen:false
+};
+
+// ─── MAP UPDATE ───────────────────────────────────────────────
+function updateMap(){
+  const sc=SC[G.cur];
+  const curMap=sc?sc.mapId:'';
+  const allIds=['start','lobby','waiting_room','exam_room','floor2','ward','nurse_station','iso_ward','morgue','burned','sealed_room','stairs12','stairsb'];
+  allIds.forEach(id=>{
+    const el=document.getElementById('mr-'+id);
+    const lb=document.getElementById('ml-'+id);
+    if(!el)return;
+    el.classList.remove('vis','cur','lck');
+    if(lb)lb.classList.remove('vis','cur');
+    const isCur=id===curMap;
+    const isVis=G.visited.has(id);
+    const isLocked=['morgue','burned','sealed_room','iso_ward'].includes(id)&&!isVis;
+    if(isCur){el.classList.add('cur');if(lb)lb.classList.add('cur');}
+    else if(isVis){el.classList.add('vis');if(lb)lb.classList.add('vis');}
+    else if(isLocked){el.classList.add('lck');}
+  });
+  // Move cursor dot
+  const dot=document.getElementById('curdot');
+  const coords=ROOM_CENTERS[curMap]||{x:-99,y:-99};
+  dot.setAttribute('cx',coords.x);
+  dot.setAttribute('cy',coords.y);
+  // Location label
+  const mn={
+    start:"診察室A",lobby:"受付ロビー",waiting_room:"待合室",exam_room:"診察室B",
+    floor2:"2F廊下",ward:"病室",nurse_station:"ナースステーション",iso_ward:"隔離病棟",
+    morgue:"霊安室",burned:"焼失区画",sealed_room:"封鎖病室",
+    stairs12:"階段(1F↔2F)",stairsb:"階段(1F↔B1)"
+  };
+  document.getElementById('maploc').textContent='現在地：'+(mn[curMap]||'——');
+  // Memory slots
+  document.getElementById('mnum').textContent=G.mem.filter(Boolean).length;
+  const strip=document.getElementById('memstrip');
+  strip.innerHTML='<div class="mslabel">MEMORY :</div>'+
+    G.mem.map((v,i)=>`<div class="ms${v?' on':''}">${v?String(i+1).padStart(2,'0'):'??'}</div>`).join('');
+  // Items
+  document.getElementById('itemrow').innerHTML=G.items.map(i=>`<span class="ibadge">${i}</span>`).join('');
+}
+
+function toggleMap(){
+  G.mapOpen=!G.mapOpen;
+  document.getElementById('mappanel').classList.toggle('open',G.mapOpen);
+  document.getElementById('maptoggle').classList.toggle('act',G.mapOpen);
+}
+
+// ─── HORROR OVERLAY ──────────────────────────────────────────
+let ghostTimer=null;
+function showHorror(type){
+  clearTimeout(ghostTimer);
+  const ov=document.getElementById('hoverlay');
+  const ic=document.getElementById('hicon');
+  ic.textContent=type;
+  ov.classList.add('show');
+  ov.classList.remove('hide');
+  ghostTimer=setTimeout(()=>{
+    ov.classList.add('hide');
+    ov.classList.remove('show');
+  },1400);
+}
+
+// ─── EVENT BANNER ─────────────────────────────────────────────
+let banTimer=null;
+function showBanner(msg){
+  const b=document.getElementById('evbanner');
+  document.getElementById('evinner').textContent='— '+msg+' —';
+  b.classList.add('show');
+  clearTimeout(banTimer);
+  banTimer=setTimeout(()=>b.classList.remove('show'),3000);
+}
+
+// ─── TYPEWRITER ───────────────────────────────────────────────
+function typeText(txt,cb){
+  const el=document.getElementById('story');
+  el.innerHTML='';let i=0;G.typing=true;
+  const cur=document.createElement('span');cur.id='cursor';el.appendChild(cur);
+  function tick(){
+    if(i<txt.length){
+      el.insertBefore(document.createTextNode(txt[i]),cur);i++;
+      const ch=txt[i-1];
+      const d=ch==='\n'?120:ch==='。'||ch==='——'?160:ch==='、'?80:42;
+      G.timer=setTimeout(tick,d);
+    }else{cur.remove();G.typing=false;if(cb)cb();}
+  }tick();
+}
+
+// ─── CHOICES ──────────────────────────────────────────────────
+function showChoices(choices){
+  const c=document.getElementById('choices');c.innerHTML='';
+  choices.forEach(ch=>{
+    const b=document.createElement('button');
+    b.className='cbtn';
+    if(ch.needsKey&&!G.flags.gotKey){
+      b.textContent='鍵がない（錆びた鍵が必要）';
+      b.disabled=true;
+    }else{
+      b.textContent=ch.t;
+      b.onclick=()=>go(ch.n,ch);
+    }
+    c.appendChild(b);
+  });
+}
+
+// ─── GOTO ─────────────────────────────────────────────────────
+function go(id,choice){
+  if(G.typing){clearTimeout(G.timer);G.typing=false;}
+  const sc=SC[id];if(!sc)return;
+  G.cur=id;
+  G.visited.add(sc.mapId||id);G.visited.add(id);
+
+  if(choice){
+    if(choice.flag)G.flags[choice.flag]=true;
+    if(choice.item&&!G.items.includes(choice.item))G.items.push(choice.item);
+    if(choice.mem!==undefined)G.mem[choice.mem]=true;
+  }
+  if(sc.flag)G.flags[sc.flag]=true;
+  if(sc.item&&!G.items.includes(sc.item))G.items.push(sc.item);
+  if(sc.mem!==undefined)G.mem[sc.mem]=true;
+
+  updateMap();
+  document.getElementById('loctag').textContent=sc.loc||'——';
+  document.getElementById('choices').innerHTML='';
+
+  // Show horror BEFORE text
+  if(sc.horror)showHorror(sc.horror);
+
+  typeText(sc.text,()=>{
+    if(sc.event)showBanner(sc.event);
+
+    if(sc.bad){
+      // Save state for continue
+      sessionStorage.setItem('savedG',JSON.stringify({mem:G.mem,items:G.items,flags:G.flags}));
+      document.getElementById('contbtn').style.display='';
+      setTimeout(()=>showEnding(sc.badType||'BAD END',sc.badTitle,sc.badDesc),1600);
+      return;
+    }
+    if(sc.ending==='true'){
+      const mc=G.mem.filter(Boolean).length;
+      document.getElementById('contbtn').style.display='none';
+      setTimeout(()=>showEnding('TRUE END','廃病院の記憶',
+        `記憶回収：${mc}/8\n\nあなたは事件の真相と向き合い、自らの過去を受け入れた。病院は静かに消滅し——あなたはようやく、前へ進めた。`),2000);
+      return;
+    }
+    if(sc.ending==='normal'){
+      const mc=G.mem.filter(Boolean).length;
+      document.getElementById('contbtn').style.display='none';
+      setTimeout(()=>showEnding('NORMAL END','生還',
+        `記憶回収：${mc}/8\n\n病院から脱出することができた。しかし、真実を知ることはなかった。忘却の中で——あなたは歩き続ける。`),2000);
+      return;
+    }
+    showChoices(sc.choices||[]);
+  });
+}
+
+function showEnding(type,title,desc){
+  document.getElementById('endtype').textContent=type;
+  document.getElementById('endtitle').textContent=title;
+  document.getElementById('enddesc').textContent=desc;
+  document.getElementById('end').classList.add('show');
+}
+
+function continueGame(){
+  const saved=sessionStorage.getItem('savedG');
+  const s=saved?JSON.parse(saved):null;
+  document.getElementById('end').classList.remove('show');
+  // Restore state
+  if(s){G.mem=s.mem;G.items=s.items;G.flags=s.flags;}
+  G.visited=new Set();G.cur='start';G.typing=false;G.timer=null;
+  G.visited.add('start');
+  updateMap();
+  go('start');
+}
+
+function restartGame(){
+  G={mem:new Array(8).fill(false),items:[],flags:{gotKey:false,gotDiary:false},
+     visited:new Set(),cur:'start',typing:false,timer:null,mapOpen:false};
+  document.getElementById('end').classList.remove('show');
+  document.getElementById('mappanel').classList.remove('open');
+  document.getElementById('maptoggle').classList.remove('act');
+  sessionStorage.removeItem('savedG');
+  updateMap();
+  document.getElementById('title').style.display='flex';
+}
+
+function startGame(){
+  document.getElementById('title').style.display='none';
+  G.visited.add('start');
+  updateMap();
+  go('start');
+}
+updateMap();
+</script>
