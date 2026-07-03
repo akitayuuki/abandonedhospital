@@ -39,8 +39,8 @@
 
 /* MAP PANEL */
 #mappanel{background:var(--surface);border-bottom:1px solid var(--border);overflow:hidden;max-height:0;transition:max-height .4s ease}
-#mappanel.open{height: 100%; max-height:300px;}
-#mapwrap{width:100%;max-width:560px;margin:0 auto;}
+#mappanel.open{height: 100%; max-height:1000px;}
+#mapwrap{width:100%;margin:0 auto;}
 #maptitlerow{font-family:var(--f-mono);font-size:9px;letter-spacing:.25em;color:var(--dim);margin-bottom:10px;display:flex;justify-content:space-between}
 #mapsvg{width:100%;height:auth;display:block}
 #memstrip{display:flex;gap:3px;margin-top:10px;padding-top:10px;border-top:1px solid #14141a;align-items:center}
@@ -141,9 +141,9 @@
       </div>
       <svg id="mapsvg" viewBox="0 0 560 230" xmlns="http://www.w3.org/2000/svg">
         <!-- Floor labels -->
-        <text x="8" y="36" class="mlabel" style="font-size:8px;fill:#303040">2F</text>
-        <text x="8" y="118" class="mlabel" style="font-size:8px;fill:#303040">1F</text>
-        <text x="8" y="200" class="mlabel" style="font-size:8px;fill:#303040">B1</text>
+        <text x="8" y="36" class="mlabel" style="font-size:8px;fill:#888888">2F</text>
+        <text x="8" y="118" class="mlabel" style="font-size:8px;fill:#888888">1F</text>
+        <text x="8" y="200" class="mlabel" style="font-size:8px;fill:#888888">B1</text>
         <!-- Floor baseline guides (dashed) -->
         <line x1="28" y1="14" x2="28" y2="215" stroke="#181820" stroke-width="1" stroke-dasharray="2 4"/>
 
@@ -275,7 +275,8 @@ const SC={
     choices:[
       {t:"受付カウンターを調べる",n:"lobby_key"},
       {t:"奥の待合室へ向かう",n:"waiting_room"},
-      {t:"入口のドアを試す",n:"exit_try"}
+      {t:"入口のドアを試す",n:"exit_try"},
+      {t:"1階の探索を終え2階へ向かう",n:"floor2_stairs"}
     ]
   },
   exit_try:{
@@ -318,7 +319,7 @@ const SC={
     choices:[
       {t:"壁の文字をよく調べる",n:"wall_text"},
       {t:"奥の診察室Bへ向かう",n:"exam_room"},
-      {t:"2階への階段へ向かう",n:"floor2_stairs"}
+      {t:"ロビーへ戻る",n:"lobby"}
     ]
   },
   wall_text:{
@@ -336,7 +337,7 @@ const SC={
     text:"足早にその場を離れた。胸の鼓動が速い。あの文字が何を意味するのか、まだわからない。ただ、自分がここで何かを見たという事実だけが頭に残った。",
     choices:[
       {t:"診察室Bへ向かう",n:"exam_room"},
-      {t:"2階へ向かう",n:"floor2_stairs"}
+      {t:"1階の探索を終え2階へ向かう",n:"floor2_stairs"}
     ]
   },
   waiting_room_deep:{
@@ -360,7 +361,7 @@ const SC={
     text:"カルテを手に取った。\n\n——記憶の断片③——\n閉ざされた病室のドア。鍵の回る音。外から鍵をかけられた——誰かによって。\n\n中に閉じ込められていたのは誰だったのか。記憶はそこで途切れた。",
     mem:2,event:"記憶の断片③を入手した",
     choices:[
-      {t:"2階へ向かう",n:"floor2_stairs"},
+      {t:"1階の探索を終え2階へ向かう",n:"floor2_stairs"},
       {t:"待合室へ戻る",n:"waiting_room"}
     ]
   },
@@ -377,7 +378,7 @@ const SC={
     loc:"1F — 診察室B",mapId:"exam_room",
     text:"お守りをポケットに入れた。誰かの祈りが宿っているような気がして、手放せなかった。",
     choices:[
-      {t:"2階へ向かう",n:"floor2_stairs"},
+      {t:"1階の探索を終え2階へ向かう",n:"floor2_stairs"},
       {t:"待合室へ戻る",n:"waiting_room"}
     ]
   },
@@ -430,7 +431,8 @@ const SC={
     text:"ナースステーションの棚に、分厚い冊子が残っていた。表紙には「事故報告書 東雲総合病院 昭和63年」とある。これを読めば真相に近づけるかもしれない。しかし同時に、知りたくないものを知ることになるという予感もあった。",
     choices:[
       {t:"事故報告書を読む",n:"nurse_record",flag:"gotDiary"},
-      {t:"廊下へ戻る",n:"floor2"}
+      {t:"廊下へ戻る",n:"floor2"},
+      {t:"地下への扉を開けて地下へ向かう",n:"to_basement"}
     ]
   },
   nurse_record:{
@@ -439,15 +441,16 @@ const SC={
     mem:4,event:"記憶の断片⑤を入手した",
     choices:[
       {t:"続きを読む",n:"nurse_record2"},
-      {t:"報告書を閉じる",n:"floor2"}
+      {t:"報告書を閉じる",n:"floor2"},
+      {t:"地下への扉を開けて地下へ向かう",n:"to_basement"}
     ]
   },
   nurse_record2:{
     loc:"2F — ナースステーション",mapId:"nurse_station",
     text:"震える指でページをめくった。「生存者（0047）は事件後、記憶の喪失を訴えた。精神的トラウマと判断。当事者の意思により記憶の封印処置を実施、封印日：昭和63年4月」——自分で、記憶を消したのか。いったい何を、忘れたかったのか。",
     choices:[
-      {t:"地下へ向かう",n:"to_basement"},
-      {t:"廊下へ戻る",n:"floor2"}
+      {t:"廊下へ戻る",n:"floor2"},
+      {t:"地下への扉を開けて地下へ向かう",n:"to_basement"}
     ]
   },
   iso_ward_locked:{
